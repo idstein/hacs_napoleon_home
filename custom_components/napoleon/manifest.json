@@ -2,7 +2,7 @@
   "domain": "napoleon",
   "name": "Napoleon Home",
   "codeowners": ["@idstein"],
-  "config_flow": true,
+  "config_flow": false,
   "dependencies": [],
   "documentation": "https://github.com/idstein/hacs_napoleon_home",
   "iot_class": "cloud_push",
