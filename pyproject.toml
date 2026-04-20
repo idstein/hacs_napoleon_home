@@ -1,0 +1,30 @@
+[project]
+name = "hacs-napoleon-home"
+version = "0.0.0"
+description = "Home Assistant custom integration for Napoleon Connected grills"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "Paul Strawder" }]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "I", "N", "UP", "ASYNC", "S", "C4", "SIM", "RUF"]
+ignore = ["S101"]  # allow asserts in tests
+
+[tool.ruff.lint.per-file-ignores]
+"custom_components/napoleon/tests/*" = ["S", "ASYNC"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unreachable = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["custom_components/napoleon/tests"]
+asyncio_mode = "auto"
+addopts = "--cov=custom_components.napoleon --cov-report=term-missing"
