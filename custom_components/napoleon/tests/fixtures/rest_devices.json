@@ -1,0 +1,16 @@
+[
+  {
+    "device": {
+      "dsn": "AC000TEST00000001",
+      "product_name": "Prestige",
+      "model": "Prestige 500",
+      "oem_model": "thermometer-mqtt-eu",
+      "key": 111111,
+      "lan_ip": "10.0.0.82",
+      "lan_enabled": true,
+      "connection_status": "Online",
+      "mac": "aa:bb:cc:dd:ee:ff",
+      "sw_version": "thermometer v6.0.10_EU"
+    }
+  }
+]

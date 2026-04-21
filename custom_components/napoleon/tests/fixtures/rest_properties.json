@@ -1,0 +1,10 @@
+[
+  {"property": {"name": "PRB_TMP_ONE", "value": 0.0, "base_type": "decimal", "direction": "output"}},
+  {"property": {"name": "PRB_TMP_FOUR", "value": 28.0, "base_type": "decimal", "direction": "output"}},
+  {"property": {"name": "TUNIT", "value": 0, "base_type": "boolean", "direction": "input"}},
+  {"property": {"name": "TNK_WT", "value": 7910, "base_type": "integer", "direction": "output"}},
+  {"property": {"name": "EMTY_TNK_W", "value": 13000, "base_type": "integer", "direction": "input"}},
+  {"property": {"name": "F_TNKWT", "value": 24000, "base_type": "integer", "direction": "input"}},
+  {"property": {"name": "RSSI", "value": -79, "base_type": "integer", "direction": "output"}},
+  {"property": {"name": "version", "value": "thermometer v6.0.10_EU", "base_type": "string", "direction": "output"}}
+]

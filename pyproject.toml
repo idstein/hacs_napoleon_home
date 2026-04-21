@@ -32,6 +32,8 @@ module = ["custom_components.napoleon.tests.*"]
 disallow_untyped_defs = false
 disallow_incomplete_defs = false
 check_untyped_defs = true
+disallow_any_generics = false
+warn_return_any = false
 
 [tool.pytest.ini_options]
 testpaths = ["custom_components/napoleon/tests"]
