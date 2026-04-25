@@ -34,6 +34,7 @@ class NapoleonCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         self.auth = auth
         self.rest = rest
         self.devices: list[Device] = []
+        self.dsns: set[str] = set()
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Update data via REST API."""
@@ -44,6 +45,7 @@ class NapoleonCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             self.devices = await self.rest.devices()
             data = {}
             for device in self.devices:
+                self.dsns.add(device.dsn)
                 props = await self.rest.properties(device.dsn)
                 data[device.dsn] = {
                     "device": device,

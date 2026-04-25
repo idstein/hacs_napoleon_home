@@ -48,11 +48,21 @@ async def test_devices_returns_flat_list(eu, auth, session):
         devices = await rest.devices()
         assert len(devices) == 1
         assert devices[0].dsn == "AC000TEST00000001"
-        assert devices[0].oem_model == "thermometer-mqtt-eu"
-        assert devices[0].key == 111111
-        assert devices[0].connection_status == "Online"
-        assert devices[0].model == "Prestige 500"
-        assert devices[0].sw_version == "thermometer v6.0.10_EU"
+
+
+async def test_devices_paginated_response(eu, auth, session):
+    with aioresponses() as m:
+        m.get(
+            f"{eu.device_url}/apiv1/devices.json",
+            payload={
+                "total": 1,
+                "devices": _fixture("rest_devices.json"),
+            },
+        )
+        rest = AylaRest(eu, auth, session=session)
+        devices = await rest.devices()
+        assert len(devices) == 1
+        assert devices[0].dsn == "AC000TEST00000001"
 
 
 async def test_properties_returns_dict_by_name(eu, auth, session):

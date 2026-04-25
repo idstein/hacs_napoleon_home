@@ -62,6 +62,8 @@ class AylaAuth:
         return {
             "Authorization": f"auth_token {self._access_token}",
             "Accept": "application/json",
+            "X-Ayla-App-Id": self._region.app_id,
+            "X-Ayla-App-Secret": self._region.app_secret,
         }
 
     def is_valid(self, *, now: datetime) -> bool:

@@ -46,7 +46,13 @@ class AylaRest:
 
     async def devices(self) -> list[Device]:
         payload = await self._get(f"{self._region.device_url}/apiv1/devices.json")
+        if isinstance(payload, dict) and "devices" in payload:
+            payload = payload["devices"]
+
         out: list[Device] = []
+        if not isinstance(payload, list):
+            return out
+
         for raw in payload:
             d = raw.get("device", raw)
             out.append(

@@ -6,10 +6,11 @@ import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .api.auth import AylaAuth
-from .api.rest import AylaRest
+from .api.auth import AylaAuth, AylaAuthError
+from .api.rest import AylaRest, CloudUnreachable
 from .const import CONF_REGION, DOMAIN
 from .coordinator import NapoleonCoordinator
 from .regions import get_region
@@ -27,13 +28,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     session = async_get_clientsession(hass)
     auth = AylaAuth(region, refresh_token=refresh_token, session=session)
 
-    # Initial refresh to get access token
-    await auth.refresh()
+    try:
+        # Initial refresh to get access token
+        await auth.refresh()
+    except (AylaAuthError, CloudUnreachable) as err:
+        raise ConfigEntryNotReady(f"Error connecting to Ayla: {err}") from err
 
     rest = AylaRest(region, auth, session=session)
     coordinator = NapoleonCoordinator(hass, auth, rest)
 
-    await coordinator.async_config_entry_first_refresh()
+    try:
+        await coordinator.async_config_entry_first_refresh()
+    except Exception as err:
+        raise ConfigEntryNotReady(f"First refresh failed: {err}") from err
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
 
