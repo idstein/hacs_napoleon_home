@@ -30,14 +30,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     try:
         # Initial refresh to get access token
-        await auth.refresh()
+        result = await auth.refresh()
+        # Save the new refresh token back to config entry
+        hass.config_entries.async_update_entry(
+            entry, data={**entry.data, "refresh_token": result.refresh_token}
+        )
     except InvalidCredentials as err:
         raise ConfigEntryAuthFailed(f"Authentication expired: {err}") from err
     except (AylaAuthError, CloudUnreachable) as err:
         raise ConfigEntryNotReady(f"Error connecting to Ayla: {err}") from err
 
     rest = AylaRest(region, auth, session=session)
-    coordinator = NapoleonCoordinator(hass, auth, rest)
+    coordinator = NapoleonCoordinator(hass, auth, rest, entry)
 
     try:
         await coordinator.async_config_entry_first_refresh()
