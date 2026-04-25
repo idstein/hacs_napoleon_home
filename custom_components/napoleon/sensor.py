@@ -14,6 +14,19 @@ from .const import DOMAIN
 from .coordinator import NapoleonCoordinator
 
 
+# Property mapping to readable names
+PROP_MAP = {
+    "PRB_TMP_ONE": "Probe 1",
+    "PRB_TMP_TWO": "Probe 2",
+    "PRB_TMP_THREE": "Probe 3",
+    "PRB_TMP_FOUR": "Probe 4",
+    "TNK_WT": "Tank Level",
+    "RSSI": "Signal Strength",
+}
+
+# Properties to exclude if they aren't useful as standalone sensors
+EXCLUDE_PROPS = {"TUNIT", "EMTY_TNK_W", "F_TNKWT", "version"}
+
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: ConfigEntry,
@@ -28,10 +41,12 @@ async def async_setup_entry(
         entities.append(NapoleonSensor(coordinator, dsn, "Software Version", "sw_version"))
         entities.append(NapoleonSensor(coordinator, dsn, "Connection Status", "connection_status"))
         
-        # Property sensors (if data available)
+        # Property sensors
         data = coordinator.data.get(dsn, {})
         properties = data.get("properties", {})
         for prop_name in properties:
+            if prop_name in EXCLUDE_PROPS:
+                continue
             entities.append(NapoleonPropertySensor(coordinator, dsn, prop_name))
 
     async_add_entities(entities)
@@ -50,7 +65,7 @@ class NapoleonSensor(CoordinatorEntity[NapoleonCoordinator], SensorEntity):
         super().__init__(coordinator)
         self._dsn = dsn
         self._attribute = attribute
-        self._attr_name = f"Napoleon {dsn} {name}"
+        self._attr_name = name
         self._attr_unique_id = f"{dsn}_{attribute}"
 
     @property
@@ -93,13 +108,19 @@ class NapoleonPropertySensor(CoordinatorEntity[NapoleonCoordinator], SensorEntit
         super().__init__(coordinator)
         self._dsn = dsn
         self._prop_name = prop_name
-        self._attr_name = f"Napoleon {dsn} {prop_name}"
+        self._attr_name = PROP_MAP.get(prop_name, prop_name)
         self._attr_unique_id = f"{dsn}_{prop_name}"
         
-        # Set device class based on name
+        # Set device class and units
         if "TMP" in prop_name:
             self._attr_device_class = "temperature"
-            self._attr_native_unit_of_measurement = "°C"  # Assume Celsius for now
+            self._attr_native_unit_of_measurement = "°C"
+        elif prop_name == "TNK_WT":
+            self._attr_native_unit_of_measurement = "%"
+            self._attr_icon = "mdi:gas-cylinder"
+        elif prop_name == "RSSI":
+            self._attr_device_class = "signal_strength"
+            self._attr_native_unit_of_measurement = "dBm"
 
     @property
     def device_info(self) -> DeviceInfo | None:
@@ -122,5 +143,22 @@ class NapoleonPropertySensor(CoordinatorEntity[NapoleonCoordinator], SensorEntit
     @property
     def native_value(self) -> Any:
         """Return the state of the sensor."""
-        properties = self.coordinator.data.get(self._dsn, {}).get("properties", {})
-        return properties.get(self._prop_name)
+        data = self.coordinator.data.get(self._dsn, {})
+        properties = data.get("properties", {})
+        val = properties.get(self._prop_name)
+
+        # Handle temperature probes sitting at 0 when disconnected
+        if "TMP" in self._prop_name and val == 0:
+            return None
+
+        # Calculate tank percentage
+        if self._prop_name == "TNK_WT":
+            empty = properties.get("EMTY_TNK_W", 0)
+            full = properties.get("F_TNKWT", 0)
+            if full > empty:
+                # Percentage = (Current - Empty) / (Full - Empty) * 100
+                pct = ((val - empty) / (full - empty)) * 100
+                return round(max(0, min(100, pct)), 1)
+            return None
+
+        return val
