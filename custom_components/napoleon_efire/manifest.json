@@ -8,5 +8,6 @@
   "iot_class": "cloud_push",
   "issue_tracker": "https://github.com/idstein/hacs_napoleon_home/issues",
   "requirements": [],
-  "version": "2.1.4"
-}
+  "version": "2.1.5"
+  }
+

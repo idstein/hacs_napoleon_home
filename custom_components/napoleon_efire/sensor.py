@@ -1,6 +1,7 @@
 """Sensor platform for Napoleon Home."""
 from __future__ import annotations
 
+import logging
 from typing import Any, cast
 
 from homeassistant.components.sensor import SensorEntity
@@ -13,8 +14,10 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN
 from .coordinator import NapoleonCoordinator
 
+_LOGGER = logging.getLogger(__name__)
 
 # Property mapping to readable names
+
 PROP_MAP = {
     "PRB_TMP_ONE": "Probe 1",
     "PRB_TMP_TWO": "Probe 2",
@@ -152,11 +155,21 @@ class NapoleonPropertySensor(CoordinatorEntity[NapoleonCoordinator], SensorEntit
         if not raw_prop or not isinstance(raw_prop, dict):
             return None
             
-        val = raw_prop.get("value")
+        val_raw = raw_prop.get("value")
+        
+        def safe_float(v: Any) -> float | None:
+            try:
+                return float(v)
+            except (ValueError, TypeError):
+                return None
 
-        # Handle temperature probes sitting at 0 when disconnected
-        if "TMP" in self._prop_name and val == 0:
-            return None
+        val = safe_float(val_raw)
+
+        # Handle temperature probes sitting at 0 or being non-numeric when disconnected
+        if "TMP" in self._prop_name:
+            if val is None or val == 0:
+                return None
+            return val
 
         # Calculate tank percentage
         if self._prop_name == "TNK_WT":
@@ -167,8 +180,11 @@ class NapoleonPropertySensor(CoordinatorEntity[NapoleonCoordinator], SensorEntit
             empty_prop = properties.get("EMTY_TNK_W")
             full_prop = properties.get("F_TNKWT")
             
-            empty = (empty_prop.get("value") if isinstance(empty_prop, dict) else None) or 13000
-            full = (full_prop.get("value") if isinstance(full_prop, dict) else None) or 24000
+            empty_raw = empty_prop.get("value") if isinstance(empty_prop, dict) else None
+            full_raw = full_prop.get("value") if isinstance(full_prop, dict) else None
+            
+            empty = safe_float(empty_raw) or 13000
+            full = safe_float(full_raw) or 24000
             
             _LOGGER.error(
                 "DIAGNOSTIC WEIGHTS: DSN=%s, val=%s, empty=%s, full=%s",
@@ -192,4 +208,4 @@ class NapoleonPropertySensor(CoordinatorEntity[NapoleonCoordinator], SensorEntit
                 
             return round(max(0, min(100, pct)), 1)
 
-        return val
+        return val_raw
