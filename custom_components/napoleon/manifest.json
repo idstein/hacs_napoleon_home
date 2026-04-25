@@ -2,11 +2,11 @@
   "domain": "napoleon",
   "name": "Napoleon Home",
   "codeowners": ["@idstein"],
-  "config_flow": false,
+  "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/idstein/hacs_napoleon_home",
   "iot_class": "cloud_push",
   "issue_tracker": "https://github.com/idstein/hacs_napoleon_home/issues",
   "requirements": ["aiomqtt>=2.3.0"],
-  "version": "0.1.0"
+  "version": "0.2.0"
 }
