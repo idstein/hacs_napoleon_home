@@ -7,8 +7,8 @@ from homeassistant import config_entries, data_entry_flow
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
 from homeassistant.core import HomeAssistant
 
-from custom_components.napoleon.api.auth import AuthResult, AylaAuthError, InvalidCredentials
-from custom_components.napoleon.const import CONF_REGION, DOMAIN
+from custom_components.napoleon_efire.api.auth import AuthResult, AylaAuthError, InvalidCredentials
+from custom_components.napoleon_efire.const import CONF_REGION, DOMAIN
 
 
 async def test_flow_user_init(hass: HomeAssistant) -> None:
@@ -22,10 +22,10 @@ async def test_flow_user_init(hass: HomeAssistant) -> None:
 async def test_flow_user_success(hass: HomeAssistant) -> None:
     """Test successful config flow."""
     with patch(
-        "custom_components.napoleon.api.auth.AylaAuth.sign_in",
+        "custom_components.napoleon_efire.api.auth.AylaAuth.sign_in",
         return_value=AuthResult("at", "rt", 3600),
     ), patch(
-        "custom_components.napoleon.async_setup_entry",
+        "custom_components.napoleon_efire.async_setup_entry",
         return_value=True,
     ) as mock_setup:
         result = await hass.config_entries.flow.async_init(
@@ -50,7 +50,7 @@ async def test_flow_user_success(hass: HomeAssistant) -> None:
 async def test_flow_user_invalid_auth(hass: HomeAssistant) -> None:
     """Test invalid authentication."""
     with patch(
-        "custom_components.napoleon.api.auth.AylaAuth.sign_in",
+        "custom_components.napoleon_efire.api.auth.AylaAuth.sign_in",
         side_effect=InvalidCredentials,
     ):
         result = await hass.config_entries.flow.async_init(
@@ -68,7 +68,7 @@ async def test_flow_user_invalid_auth(hass: HomeAssistant) -> None:
 async def test_flow_user_cannot_connect(hass: HomeAssistant) -> None:
     """Test connection error."""
     with patch(
-        "custom_components.napoleon.api.auth.AylaAuth.sign_in",
+        "custom_components.napoleon_efire.api.auth.AylaAuth.sign_in",
         side_effect=AylaAuthError,
     ):
         result = await hass.config_entries.flow.async_init(

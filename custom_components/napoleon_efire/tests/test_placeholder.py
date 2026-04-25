@@ -3,6 +3,6 @@
 
 def test_package_importable() -> None:
     """The napoleon package imports and exposes its module name."""
-    import custom_components.napoleon as pkg
+    import custom_components.napoleon_efire as pkg
 
-    assert pkg.__name__ == "custom_components.napoleon"
+    assert pkg.__name__ == "custom_components.napoleon_efire"

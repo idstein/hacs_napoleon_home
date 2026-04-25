@@ -12,13 +12,13 @@ import pytest
 import pytest_asyncio
 from aioresponses import aioresponses
 
-from custom_components.napoleon.api.auth import AylaAuth, InvalidCredentials
-from custom_components.napoleon.api.rest import AylaRest, CloudUnreachable
-from custom_components.napoleon.regions import REGION_EU, get_region
+from custom_components.napoleon_efire.api.auth import AylaAuth, InvalidCredentials
+from custom_components.napoleon_efire.api.rest import AylaRest, CloudUnreachable
+from custom_components.napoleon_efire.regions import REGION_EU, get_region
 
 
 def _fixture(name: str) -> list | dict:
-    p = files("custom_components.napoleon.tests.fixtures").joinpath(name)
+    p = files("custom_components.napoleon_efire.tests.fixtures").joinpath(name)
     return json.loads(p.read_text())
 
 

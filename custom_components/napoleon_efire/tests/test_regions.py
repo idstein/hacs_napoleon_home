@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from custom_components.napoleon.regions import (
+from custom_components.napoleon_efire.regions import (
     REGION_EU,
     REGION_US,
     UnknownRegion,

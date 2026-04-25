@@ -16,7 +16,7 @@ select = ["E", "F", "W", "B", "I", "N", "UP", "ASYNC", "S", "C4", "SIM", "RUF"]
 ignore = ["S101"]  # allow asserts in tests
 
 [tool.ruff.lint.per-file-ignores]
-"custom_components/napoleon/tests/*" = ["S", "ASYNC"]
+"custom_components/napoleon_efire/tests/*" = ["S", "ASYNC"]
 
 [tool.mypy]
 python_version = "3.12"
@@ -28,7 +28,7 @@ namespace_packages = true
 mypy_path = "."
 
 [[tool.mypy.overrides]]
-module = ["custom_components.napoleon.tests.*"]
+module = ["custom_components.napoleon_efire.tests.*"]
 disallow_untyped_defs = false
 disallow_incomplete_defs = false
 check_untyped_defs = true
@@ -36,7 +36,7 @@ disallow_any_generics = false
 warn_return_any = false
 
 [tool.pytest.ini_options]
-testpaths = ["custom_components/napoleon/tests"]
+testpaths = ["custom_components/napoleon_efire/tests"]
 pythonpath = ["."]
 asyncio_mode = "auto"
-addopts = "--cov=custom_components.napoleon --cov-report=term-missing"
+addopts = "--cov=custom_components.napoleon_efire --cov-report=term-missing"

@@ -10,12 +10,12 @@ import pytest
 import pytest_asyncio
 from aioresponses import aioresponses
 
-from custom_components.napoleon.api.auth import (
+from custom_components.napoleon_efire.api.auth import (
     AylaAuth,
     AylaAuthError,
     InvalidCredentials,
 )
-from custom_components.napoleon.regions import REGION_EU, get_region
+from custom_components.napoleon_efire.regions import REGION_EU, get_region
 
 
 @pytest.fixture
