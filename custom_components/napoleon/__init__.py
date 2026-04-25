@@ -36,7 +36,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             entry, data={**entry.data, "refresh_token": result.refresh_token}
         )
     except InvalidCredentials as err:
-        raise ConfigEntryAuthFailed(f"Authentication expired: {err}") from err
+        _LOGGER.error("Authentication expired for %s, starting reauth flow: %s", entry.title, err)
+        hass.async_create_task(
+            hass.config_entries.flow.async_init(
+                DOMAIN,
+                context={"source": "reauth", "entry_id": entry.entry_id},
+                data=entry.data,
+            )
+        )
+        return False
     except (AylaAuthError, CloudUnreachable) as err:
         raise ConfigEntryNotReady(f"Error connecting to Ayla: {err}") from err
 
