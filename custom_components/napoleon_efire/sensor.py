@@ -22,7 +22,7 @@ PROP_MAP = {
     "PRB_TMP_ONE": "Probe 1",
     "PRB_TMP_TWO": "Probe 2",
     "PRB_TMP_THREE": "Probe 3",
-    "PRB_TMP_FOUR": "Probe 4",
+    "PRB_TMP_FOUR": "Grill Temperature",
     "TNK_WT": "Tank Level",
     "RSSI": "Signal Strength",
 }
