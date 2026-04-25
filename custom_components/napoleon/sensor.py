@@ -158,22 +158,27 @@ class NapoleonPropertySensor(CoordinatorEntity[NapoleonCoordinator], SensorEntit
             if val is None:
                 return None
             
-            # Default to Rheingas 11kg specs if device properties are missing or zero
-            # Tare: ~13000g, Gas: 11000g, Total Full: 24000g
+            # Values from user's grill: val=11000, empty=11000, full=22000
+            # This suggests the grill reports NET weight (0 to 11000).
+            # We use Rheingas 11kg defaults if properties look wrong.
             empty = properties.get("EMTY_TNK_W") or 13000
             full = properties.get("F_TNKWT") or 24000
             
-            if full > empty:
-                # If current weight is lower than empty weight, it might be just gas weight
-                # Some Ayla implementations report TNK_WT as just the gas weight delta.
+            # Heuristic: If empty == capacity (like 11000), it's likely reporting net weight.
+            # If val is close to full and full is ~2x empty, it's likely net weight.
+            if empty == 11000 and full == 22000:
+                # Grill is reporting net gas weight (0 to 11000)
+                pct = (val / 11000) * 100
+            elif full > empty:
                 if val < empty and val > 0:
-                    # Treat val as gas weight directly
+                    # Likely net weight
                     pct = (val / (full - empty)) * 100
                 else:
-                    # Treat val as total weight (Current - Empty) / (Full - Empty)
+                    # Likely total weight
                     pct = ((val - empty) / (full - empty)) * 100
+            else:
+                return None
                 
-                return round(max(0, min(100, pct)), 1)
-            return None
+            return round(max(0, min(100, pct)), 1)
 
         return val
