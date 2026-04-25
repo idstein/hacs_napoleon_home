@@ -75,7 +75,7 @@ class AylaRest:
         out: dict[str, Any] = {}
         for item in raw:
             prop = item.get("property", item)
-            out[prop["name"]] = prop.get("value")
+            out[prop["name"]] = prop
         return out
 
     async def lan_config(self, device_key: int) -> dict[str, Any]:

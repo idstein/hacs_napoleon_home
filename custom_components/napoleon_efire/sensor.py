@@ -147,7 +147,12 @@ class NapoleonPropertySensor(CoordinatorEntity[NapoleonCoordinator], SensorEntit
         """Return the state of the sensor."""
         data = self.coordinator.data.get(self._dsn, {})
         properties = data.get("properties", {})
-        val = properties.get(self._prop_name)
+        raw_prop = properties.get(self._prop_name)
+        
+        if not raw_prop or not isinstance(raw_prop, dict):
+            return None
+            
+        val = raw_prop.get("value")
 
         # Handle temperature probes sitting at 0 when disconnected
         if "TMP" in self._prop_name and val == 0:
@@ -158,11 +163,12 @@ class NapoleonPropertySensor(CoordinatorEntity[NapoleonCoordinator], SensorEntit
             if val is None:
                 return None
             
-            # Values from user's grill: val=11000, empty=11000, full=22000
-            # This suggests the grill reports NET weight (0 to 11000).
-            # We use Rheingas 11kg defaults if properties look wrong.
-            empty = properties.get("EMTY_TNK_W") or 13000
-            full = properties.get("F_TNKWT") or 24000
+            # Extract raw values from dicts for calculation
+            empty_prop = properties.get("EMTY_TNK_W")
+            full_prop = properties.get("F_TNKWT")
+            
+            empty = (empty_prop.get("value") if isinstance(empty_prop, dict) else None) or 13000
+            full = (full_prop.get("value") if isinstance(full_prop, dict) else None) or 24000
             
             _LOGGER.error(
                 "DIAGNOSTIC WEIGHTS: DSN=%s, val=%s, empty=%s, full=%s",
