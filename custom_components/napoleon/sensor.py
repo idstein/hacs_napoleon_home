@@ -164,6 +164,11 @@ class NapoleonPropertySensor(CoordinatorEntity[NapoleonCoordinator], SensorEntit
             empty = properties.get("EMTY_TNK_W") or 13000
             full = properties.get("F_TNKWT") or 24000
             
+            _LOGGER.error(
+                "DIAGNOSTIC WEIGHTS: DSN=%s, val=%s, empty=%s, full=%s",
+                self._dsn, val, empty, full
+            )
+            
             # Heuristic: If empty == capacity (like 11000), it's likely reporting net weight.
             # If val is close to full and full is ~2x empty, it's likely net weight.
             if empty == 11000 and full == 22000:
