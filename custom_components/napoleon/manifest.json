@@ -1,5 +1,5 @@
 {
-  "domain": "napoleon",
+  "domain": "napoleon_efire",
   "name": "Napoleon Home",
   "codeowners": ["@idstein"],
   "config_flow": true,
@@ -8,5 +8,5 @@
   "iot_class": "cloud_push",
   "issue_tracker": "https://github.com/idstein/hacs_napoleon_home/issues",
   "requirements": [],
-  "version": "2.1.1"
+  "version": "2.1.2"
 }

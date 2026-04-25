@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Final
 
-DOMAIN: Final = "napoleon"
+DOMAIN: Final = "napoleon_efire"
 
 CONF_REGION: Final = "region"
 CONF_EMAIL: Final = "email"

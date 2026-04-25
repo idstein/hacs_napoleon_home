@@ -11,6 +11,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from homeassistant.util import dt as dt_util
 
 from .const import DOMAIN
+
 from .api.auth import AylaAuth, AylaAuthError, InvalidCredentials
 from .api.rest import AylaRest, CloudUnreachable, Device
 
