@@ -10,6 +10,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util import dt as dt_util
 
+from .const import DOMAIN
 from .api.auth import AylaAuth, AylaAuthError, InvalidCredentials
 from .api.rest import AylaRest, CloudUnreachable, Device
 
