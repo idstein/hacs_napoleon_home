@@ -6,10 +6,10 @@ import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .api.auth import AylaAuth, AylaAuthError
+from .api.auth import AylaAuth, AylaAuthError, InvalidCredentials
 from .api.rest import AylaRest, CloudUnreachable
 from .const import CONF_REGION, DOMAIN
 from .coordinator import NapoleonCoordinator
@@ -31,6 +31,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     try:
         # Initial refresh to get access token
         await auth.refresh()
+    except InvalidCredentials as err:
+        raise ConfigEntryAuthFailed(f"Authentication expired: {err}") from err
     except (AylaAuthError, CloudUnreachable) as err:
         raise ConfigEntryNotReady(f"Error connecting to Ayla: {err}") from err
 
