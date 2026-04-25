@@ -67,6 +67,7 @@ class NapoleonSensor(CoordinatorEntity[NapoleonCoordinator], SensorEntity):
         self._attribute = attribute
         self._attr_name = name
         self._attr_unique_id = f"{dsn}_{attribute}"
+        self._attr_has_entity_name = True
 
     @property
     def device_info(self) -> DeviceInfo | None:
@@ -110,6 +111,7 @@ class NapoleonPropertySensor(CoordinatorEntity[NapoleonCoordinator], SensorEntit
         self._prop_name = prop_name
         self._attr_name = PROP_MAP.get(prop_name, prop_name)
         self._attr_unique_id = f"{dsn}_{prop_name}"
+        self._attr_has_entity_name = True
         
         # Set device class and units
         if "TMP" in prop_name:
@@ -153,11 +155,24 @@ class NapoleonPropertySensor(CoordinatorEntity[NapoleonCoordinator], SensorEntit
 
         # Calculate tank percentage
         if self._prop_name == "TNK_WT":
-            empty = properties.get("EMTY_TNK_W", 0)
-            full = properties.get("F_TNKWT", 0)
+            if val is None:
+                return None
+            
+            # Default to Rheingas 11kg specs if device properties are missing or zero
+            # Tare: ~13000g, Gas: 11000g, Total Full: 24000g
+            empty = properties.get("EMTY_TNK_W") or 13000
+            full = properties.get("F_TNKWT") or 24000
+            
             if full > empty:
-                # Percentage = (Current - Empty) / (Full - Empty) * 100
-                pct = ((val - empty) / (full - empty)) * 100
+                # If current weight is lower than empty weight, it might be just gas weight
+                # Some Ayla implementations report TNK_WT as just the gas weight delta.
+                if val < empty and val > 0:
+                    # Treat val as gas weight directly
+                    pct = (val / (full - empty)) * 100
+                else:
+                    # Treat val as total weight (Current - Empty) / (Full - Empty)
+                    pct = ((val - empty) / (full - empty)) * 100
+                
                 return round(max(0, min(100, pct)), 1)
             return None
 
